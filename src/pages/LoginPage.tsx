@@ -4,7 +4,8 @@ import { FormInput } from "../components/FormInput";
 import { SocialButton } from "../components/SocialButton";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { ForgotPasswordModal } from "../components/ForgotPasswordModal";
-import { ChevronDown, LogIn, Sparkles } from "lucide-react";
+import { ChevronDown, LogIn } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
 
 interface LoginFormData {
   email: string;
@@ -24,9 +25,10 @@ export function LoginPage({ onNavigateToRegister, onLoginSuccess }: LoginPagePro
 
   const [errors, setErrors] = useState<Partial<Record<keyof LoginFormData, string>>>({});
   const [rememberMe, setRememberMe] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [showSocial, setShowSocial] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  
+  const { login, loading, error } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -65,34 +67,18 @@ export function LoginPage({ onNavigateToRegister, onLoginSuccess }: LoginPagePro
     e.preventDefault();
     
     if (validateForm()) {
-      setLoading(true);
-      
-      // Simular llamada al API
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      console.log("Login exitoso:", { ...formData, rememberMe });
-      
-      // Aquí conectarás con tu API Gateway:
-      // try {
-      //   const response = await fetch('TU_API_GATEWAY_URL/auth/login', {
-      //     method: 'POST',
-      //     headers: { 'Content-Type': 'application/json' },
-      //     body: JSON.stringify({ 
-      //       email: formData.email,
-      //       password: formData.password,
-      //       rememberMe 
-      //     })
-      //   });
-      //   const data = await response.json();
-      //   if (response.ok) {
-      //     onLoginSuccess();
-      //   }
-      // } catch (error) {
-      //   console.error('Error en login:', error);
-      // }
-      
-      setLoading(false);
-      onLoginSuccess(); // Redirigir al dashboard
+      try {
+        await login({
+          email: formData.email,
+          password: formData.password,
+          rememberMe: rememberMe
+        });
+        
+        onLoginSuccess();
+      } catch (err) {
+        console.error("Error en login:", err);
+        // El error ya se maneja en useAuth
+      }
     }
   };
 
@@ -125,6 +111,12 @@ export function LoginPage({ onNavigateToRegister, onLoginSuccess }: LoginPagePro
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+            
             <FormInput
               label="Correo electrónico"
               name="email"

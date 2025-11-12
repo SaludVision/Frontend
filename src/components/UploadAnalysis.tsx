@@ -83,33 +83,13 @@ export function UploadAnalysis({ onUploadComplete }: UploadAnalysisProps) {
 
     setUploading(true);
     
-    // Simular subida y análisis
     await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // Aquí se conectará con tu API Gateway
-    // const formData = new FormData();
-    // formData.append('image', selectedFile);
-    // formData.append('analysisType', analysisType);
-    // 
-    // try {
-    //   const response = await fetch('TU_API_GATEWAY_URL/analysis/upload', {
-    //     method: 'POST',
-    //     body: formData,
-    //   });
-    //   const data = await response.json();
-    //   if (response.ok) {
-    //     onUploadComplete?.(selectedFile, analysisType);
-    //   }
-    // } catch (error) {
-    //   console.error('Error al subir:', error);
-    // }
-    
+
     console.log('Archivo subido:', selectedFile.name, 'Tipo:', analysisType);
     setUploading(false);
     setUploadSuccess(true);
     onUploadComplete?.(selectedFile, analysisType);
     
-    // Limpiar después de 2 segundos
     setTimeout(() => {
       handleRemoveFile();
     }, 2000);

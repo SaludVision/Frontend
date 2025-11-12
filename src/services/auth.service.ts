@@ -1,8 +1,3 @@
-/**
- * Auth Service - Servicio de autenticación
- * Maneja toda la lógica relacionada con autenticación
- */
-
 import { httpClient } from '../lib/http-client';
 import { API_CONFIG } from '../config/api.config';
 import {
@@ -17,13 +12,15 @@ import {
 } from '../types/domain.types';
 
 class AuthService {
-  /**
-   * Iniciar sesión
-   */
+  // Iniciar sesión
   async login(request: LoginRequest): Promise<LoginResponse> {
     const response = await httpClient.post<LoginResponse>(
       API_CONFIG.AUTH_SERVICE.LOGIN,
-      request
+      {
+        email: request.email,
+        password: request.password,
+        rememberMe: request.rememberMe
+      }
     );
 
     // Guardar tokens en localStorage
@@ -36,45 +33,68 @@ class AuthService {
     return response;
   }
 
-  /**
-   * Registrar nuevo usuario
-   */
+  // Registrar nuevo usuario
   async register(request: RegisterRequest): Promise<RegisterResponse> {
     const response = await httpClient.post<RegisterResponse>(
       API_CONFIG.AUTH_SERVICE.REGISTER,
-      request
+      {
+        name: request.name,
+        email: request.email,
+        password: request.password,
+        dni: request.dni,
+        specialty: request.specialty,
+        professionalId: request.professionalId,
+        hospital: request.hospital,
+        phone: request.phone
+      }
     );
 
     return response;
   }
 
-  /**
-   * Verificar si un email existe
-   */
+  // Verificar email
   async verifyEmail(request: VerifyEmailRequest): Promise<VerifyEmailResponse> {
-    const response = await httpClient.post<VerifyEmailResponse>(
-      API_CONFIG.AUTH_SERVICE.VERIFY_EMAIL,
-      request
-    );
+    const response = await httpClient.get<{
+      success: boolean;
+      email: string;
+      available: boolean;
+      message: string;
+    }>(`${API_CONFIG.AUTH_SERVICE.VERIFY_EMAIL}/${encodeURIComponent(request.email)}`);
 
-    return response;
+    return {
+      exists: !response.available,
+      email: request.email,
+    };
   }
 
-  /**
-   * Restablecer contraseña
-   */
+ // Restablecer contraseña
   async resetPassword(request: ResetPasswordRequest): Promise<ResetPasswordResponse> {
-    const response = await httpClient.post<ResetPasswordResponse>(
-      API_CONFIG.AUTH_SERVICE.RESET_PASSWORD,
-      request
-    );
+    try {
+      const response = await httpClient.post<{ success: boolean; message: string }>(
+        API_CONFIG.AUTH_SERVICE.RESET_PASSWORD,
+        {
+          email: request.email,
+          newPassword: request.newPassword
+        }
+      );
 
-    return response;
+      return {
+        success: response.success,
+        message: response.message || 'Contraseña actualizada correctamente'
+      };
+    } catch (error: any) {
+      if (error.status === 404) {
+        return {
+          success: false,
+          message: 'No existe una cuenta asociada a este correo electrónico'
+        };
+      }
+      
+      throw error;
+    }
   }
 
-  /**
-   * Refrescar token de acceso
-   */
+  // Renovar tokens
   async refreshToken(): Promise<{ accessToken: string; refreshToken: string }> {
     const refreshToken = localStorage.getItem('refreshToken');
     
@@ -82,21 +102,10 @@ class AuthService {
       throw new Error('No refresh token available');
     }
 
-    const response = await httpClient.post<{ accessToken: string; refreshToken: string }>(
-      API_CONFIG.AUTH_SERVICE.REFRESH_TOKEN,
-      { refreshToken }
-    );
-
-    // Actualizar tokens
-    localStorage.setItem('accessToken', response.accessToken);
-    localStorage.setItem('refreshToken', response.refreshToken);
-
-    return response;
+    throw new Error('La renovación de tokens no está disponible');
   }
 
-  /**
-   * Cerrar sesión
-   */
+ // Cerrar sesión
   async logout(): Promise<void> {
     try {
       await httpClient.post(API_CONFIG.AUTH_SERVICE.LOGOUT);
@@ -108,17 +117,13 @@ class AuthService {
     }
   }
 
-  /**
-   * Obtener perfil del usuario actual desde localStorage
-   */
+  // Obtener perfil del usuario actual
   getCurrentUser() {
     const userProfile = localStorage.getItem('userProfile');
     return userProfile ? JSON.parse(userProfile) : null;
   }
 
-  /**
-   * Verificar si el usuario está autenticado
-   */
+  // Verificar si el usuario está autenticado
   isAuthenticated(): boolean {
     return !!localStorage.getItem('accessToken');
   }

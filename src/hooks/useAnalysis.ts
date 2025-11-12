@@ -1,7 +1,3 @@
-/**
- * useAnalysis Hook - Hook personalizado para análisis médicos
- */
-
 import { useState } from 'react';
 import { analysisService } from '../services/analysis.service';
 import {

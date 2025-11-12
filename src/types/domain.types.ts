@@ -1,10 +1,3 @@
-/**
- * Domain Types - Modelos de dominio según DDD
- */
-
-// ============================================
-// AUTH DOMAIN
-// ============================================
 
 export interface LoginRequest {
   email: string;
@@ -20,11 +13,12 @@ export interface LoginResponse {
 }
 
 export interface RegisterRequest {
-  fullName: string;
+  name: string;
   email: string;
   password: string;
+  dni: string;
   specialty: string;
-  medicalLicense: string;
+  professionalId: string;
   hospital: string;
   phone: string;
 }
@@ -53,16 +47,13 @@ export interface ResetPasswordResponse {
   message: string;
 }
 
-// ============================================
-// USER DOMAIN
-// ============================================
-
 export interface UserProfile {
   id: string;
-  fullName: string;
+  name: string;
   email: string;
+  dni: string;
   specialty: string;
-  medicalLicense: string;
+  professionalId: string;
   hospital: string;
   phone: string;
   createdAt: string;
@@ -70,15 +61,13 @@ export interface UserProfile {
 }
 
 export interface UpdateProfileRequest {
-  fullName?: string;
+  name?: string;
+  dni?: string;
   specialty?: string;
   hospital?: string;
   phone?: string;
 }
 
-// ============================================
-// ANALYSIS DOMAIN
-// ============================================
 
 export type AnalysisType = 
   | 'radiografia' 
@@ -125,9 +114,6 @@ export interface AnalysisListResponse {
   pageSize: number;
 }
 
-// ============================================
-// REPORT DOMAIN
-// ============================================
 
 export interface Report {
   id: string;
@@ -147,10 +133,6 @@ export interface ReportListResponse {
   pageSize: number;
 }
 
-// ============================================
-// NOTIFICATION DOMAIN
-// ============================================
-
 export type NotificationType = 'success' | 'warning' | 'info' | 'error';
 
 export interface Notification {
@@ -169,10 +151,6 @@ export interface NotificationListResponse {
   unreadCount: number;
   total: number;
 }
-
-// ============================================
-// COMMON
-// ============================================
 
 export interface ApiError {
   message: string;

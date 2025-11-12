@@ -4,15 +4,17 @@ import { FormInput } from "../components/FormInput";
 import { SocialButton } from "../components/SocialButton";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { PasswordStrength } from "../components/PasswordStrength";
-import { ChevronDown, UserPlus, Sparkles } from "lucide-react";
+import { ChevronDown, UserPlus } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
 
 interface RegisterFormData {
-  fullName: string;
+  name: string;
   email: string;
   password: string;
   confirmPassword: string;
+  dni: string;
   specialty: string;
-  medicalLicense: string;
+  professionalId: string;
   hospital: string;
   phone: string;
 }
@@ -24,20 +26,22 @@ interface RegisterPageProps {
 
 export function RegisterPage({ onNavigateToLogin, onRegisterSuccess }: RegisterPageProps) {
   const [formData, setFormData] = useState<RegisterFormData>({
-    fullName: "",
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
+    dni: "",
     specialty: "",
-    medicalLicense: "",
+    professionalId: "",
     hospital: "",
     phone: "",
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof RegisterFormData, string>>>({});
-  const [loading, setLoading] = useState(false);
   const [showSocial, setShowSocial] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  
+  const { register, loading, error } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -56,16 +60,22 @@ export function RegisterPage({ onNavigateToLogin, onRegisterSuccess }: RegisterP
   const validateStep1 = (): boolean => {
     const newErrors: Partial<Record<keyof RegisterFormData, string>> = {};
 
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "El nombre completo es requerido";
-    } else if (formData.fullName.trim().length < 3) {
-      newErrors.fullName = "El nombre debe tener al menos 3 caracteres";
+    if (!formData.name.trim()) {
+      newErrors.name = "El nombre completo es requerido";
+    } else if (formData.name.trim().length < 3) {
+      newErrors.name = "El nombre debe tener al menos 3 caracteres";
     }
 
     if (!formData.email.trim()) {
       newErrors.email = "El correo electrónico es requerido";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Ingresa un correo electrónico válido";
+    }
+
+    if (!formData.dni.trim()) {
+      newErrors.dni = "El DNI es requerido";
+    } else if (!/^\d{8}$/.test(formData.dni)) {
+      newErrors.dni = "El DNI debe tener 8 dígitos";
     }
 
     if (!formData.specialty.trim()) {
@@ -91,8 +101,8 @@ export function RegisterPage({ onNavigateToLogin, onRegisterSuccess }: RegisterP
       newErrors.confirmPassword = "Las contraseñas no coinciden";
     }
 
-    if (!formData.medicalLicense.trim()) {
-      newErrors.medicalLicense = "La licencia médica es requerida";
+    if (!formData.professionalId.trim()) {
+      newErrors.professionalId = "El ID profesional es requerido";
     }
 
     if (!formData.hospital.trim()) {
@@ -119,41 +129,24 @@ export function RegisterPage({ onNavigateToLogin, onRegisterSuccess }: RegisterP
     e.preventDefault();
     
     if (validateStep2()) {
-      setLoading(true);
-      
-      // Simular llamada al API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      console.log("Registro exitoso:", formData);
-      
-      // Guardar datos del usuario en localStorage para mostrar en el perfil
-      localStorage.setItem('userProfile', JSON.stringify({
-        fullName: formData.fullName,
-        email: formData.email,
-        specialty: formData.specialty,
-        medicalLicense: formData.medicalLicense,
-        hospital: formData.hospital,
-        phone: formData.phone,
-      }));
-      
-      // Aquí conectarás con tu API Gateway:
-      // try {
-      //   const response = await fetch('TU_API_GATEWAY_URL/auth/register', {
-      //     method: 'POST',
-      //     headers: { 'Content-Type': 'application/json' },
-      //     body: JSON.stringify(formData)
-      //   });
-      //   const data = await response.json();
-      //   if (response.ok) {
-      //     localStorage.setItem('userProfile', JSON.stringify(data.user));
-      //     onRegisterSuccess();
-      //   }
-      // } catch (error) {
-      //   console.error('Error en registro:', error);
-      // }
-      
-      setLoading(false);
-      onNavigateToLogin();
+      try {
+        await register({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          dni: formData.dni,
+          specialty: formData.specialty,
+          professionalId: formData.professionalId,
+          hospital: formData.hospital,
+          phone: formData.phone,
+        });
+        
+        // Si el registro fue exitoso, redirigir al login
+        onNavigateToLogin();
+      } catch (err) {
+        console.error("Error en registro:", err);
+        // El error ya se maneja en useAuth
+      }
     }
   };
 
@@ -271,12 +264,12 @@ export function RegisterPage({ onNavigateToLogin, onRegisterSuccess }: RegisterP
             >
               <FormInput
                 label="Nombre completo"
-                name="fullName"
+                name="name"
                 placeholder="Dr. Juan Pérez"
                 required
-                value={formData.fullName}
+                value={formData.name}
                 onChange={handleChange}
-                error={errors.fullName}
+                error={errors.name}
                 showValidation
               />
 
@@ -289,6 +282,18 @@ export function RegisterPage({ onNavigateToLogin, onRegisterSuccess }: RegisterP
                 value={formData.email}
                 onChange={handleChange}
                 error={errors.email}
+                showValidation
+              />
+
+              <FormInput
+                label="DNI"
+                name="dni"
+                type="text"
+                placeholder="12345678"
+                required
+                value={formData.dni}
+                onChange={handleChange}
+                error={errors.dni}
                 showValidation
               />
 
@@ -321,6 +326,12 @@ export function RegisterPage({ onNavigateToLogin, onRegisterSuccess }: RegisterP
               onSubmit={handleSubmit}
               className="space-y-5"
             >
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
+              
               <FormInput
                 label="Contraseña"
                 name="password"
@@ -355,13 +366,13 @@ export function RegisterPage({ onNavigateToLogin, onRegisterSuccess }: RegisterP
               />
 
               <FormInput
-                label="Licencia médica / Matrícula profesional"
-                name="medicalLicense"
+                label="ID Profesional / Matrícula profesional"
+                name="professionalId"
                 placeholder="MP 12345"
                 required
-                value={formData.medicalLicense}
+                value={formData.professionalId}
                 onChange={handleChange}
-                error={errors.medicalLicense}
+                error={errors.professionalId}
                 showValidation
               />
 

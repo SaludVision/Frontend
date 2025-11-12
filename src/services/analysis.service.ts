@@ -1,8 +1,3 @@
-/**
- * Analysis Service - Servicio de análisis médicos
- * Maneja toda la lógica relacionada con análisis de imágenes
- */
-
 import { httpClient } from '../lib/http-client';
 import { API_CONFIG } from '../config/api.config';
 import {
@@ -13,9 +8,7 @@ import {
 } from '../types/domain.types';
 
 class AnalysisService {
-  /**
-   * Subir imagen para análisis
-   */
+  // Subir nuevo analisis
   async uploadAnalysis(request: UploadAnalysisRequest): Promise<Analysis> {
     const formData = new FormData();
     formData.append('image', request.image);
@@ -37,18 +30,14 @@ class AnalysisService {
     return response;
   }
 
-  /**
-   * Obtener análisis por ID
-   */
+  // Obtener análisis por ID
   async getAnalysisById(id: string): Promise<Analysis> {
     const endpoint = API_CONFIG.ANALYSIS_SERVICE.GET_BY_ID.replace(':id', id);
     const response = await httpClient.get<Analysis>(endpoint);
     return response;
   }
 
-  /**
-   * Listar análisis con paginación
-   */
+  // Listar análisis con paginación
   async listAnalyses(params?: PaginationParams): Promise<AnalysisListResponse> {
     const queryParams = new URLSearchParams();
     
@@ -63,9 +52,7 @@ class AnalysisService {
     return response;
   }
 
-  /**
-   * Eliminar análisis
-   */
+  // Eliminar análisis por ID
   async deleteAnalysis(id: string): Promise<{ success: boolean }> {
     const endpoint = API_CONFIG.ANALYSIS_SERVICE.DELETE.replace(':id', id);
     const response = await httpClient.delete<{ success: boolean }>(endpoint);

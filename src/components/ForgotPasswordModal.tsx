@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Mail, CheckCircle2, ArrowLeft, AlertCircle, Lock } from "lucide-react";
+import { X, Mail, CheckCircle2, ArrowLeft, Lock } from "lucide-react";
 import { FormInput } from "./FormInput";
 import { PrimaryButton } from "./PrimaryButton";
 import { PasswordStrength } from "./PasswordStrength";
+import { useAuth } from "../hooks/useAuth";
 
 interface ForgotPasswordModalProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ interface ForgotPasswordModalProps {
 type ModalStep = "email" | "change-password" | "success";
 
 export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProps) {
+  const { verifyEmail, resetPassword } = useAuth();
   const [step, setStep] = useState<ModalStep>("email");
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -22,7 +24,7 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const validateEmail = (email: string): boolean => {
+  const validateEmail = useCallback((email: string): boolean => {
     if (!email.trim()) {
       setEmailError("El correo electrónico es requerido");
       return false;
@@ -33,9 +35,9 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
     }
     setEmailError("");
     return true;
-  };
+  }, []);
 
-  const validatePasswordChange = (): boolean => {
+  const validatePasswordChange = useCallback((): boolean => {
     let isValid = true;
 
     if (!newPassword) {
@@ -59,7 +61,7 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
     }
 
     return isValid;
-  };
+  }, [newPassword, confirmPassword]);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,37 +70,19 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
 
     setLoading(true);
 
-    // Simular validación con el backend
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const response = await verifyEmail({ email });
 
-    // Aquí conectarás con tu API Gateway para verificar si el email existe:
-    // try {
-    //   const response = await fetch('TU_API_GATEWAY_URL/auth/verify-email', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ email })
-    //   });
-    //   const data = await response.json();
-    //   
-    //   if (response.ok && data.exists) {
-    //     setStep("change-password");
-    //   } else {
-    //     setEmailError('No existe una cuenta asociada a este correo electrónico');
-    //   }
-    // } catch (error) {
-    //   console.error('Error:', error);
-    //   setEmailError('Hubo un error. Por favor intenta nuevamente.');
-    // }
-
-    // Simulación: Por ahora siempre encuentra el email
-    const emailExists = true; // Simula que el email existe
-    
-    setLoading(false);
-
-    if (emailExists) {
-      setStep("change-password");
-    } else {
-      setEmailError("No existe una cuenta asociada a este correo electrónico");
+      if (response.exists) {
+        setStep("change-password");
+      } else {
+        setEmailError('No existe una cuenta asociada a este correo electrónico');
+      }
+    } catch (error: any) {
+      console.error('Error al verificar email:', error);
+      setEmailError(error.message || 'Hubo un error. Por favor intenta nuevamente.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,35 +93,19 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
 
     setLoading(true);
 
-    // Simular cambio de contraseña
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    console.log("Contraseña cambiada para:", email);
-
-    // Aquí conectarás con tu API Gateway para cambiar la contraseña:
-    // try {
-    //   const response = await fetch('TU_API_GATEWAY_URL/auth/reset-password', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ 
-    //       email,
-    //       newPassword 
-    //     })
-    //   });
-    //   const data = await response.json();
-    //   
-    //   if (response.ok) {
-    //     setStep("success");
-    //   } else {
-    //     setPasswordError('Error al cambiar la contraseña. Intenta nuevamente.');
-    //   }
-    // } catch (error) {
-    //   console.error('Error:', error);
-    //   setPasswordError('Hubo un error. Por favor intenta nuevamente.');
-    // }
-
-    setLoading(false);
-    setStep("success");
+    try {
+      const res = await resetPassword({ email, newPassword });
+      if (res && res.success) {
+        setStep("success");
+      } else {
+        setPasswordError(res.message || 'Error al cambiar la contraseña. Intenta nuevamente.');
+      }
+    } catch (error: any) {
+      console.error('Error al cambiar contraseña:', error);
+      setPasswordError(error.message || 'Error al cambiar la contraseña. Intenta nuevamente.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -181,6 +149,7 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}
             onClick={handleClose}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
           />
@@ -188,23 +157,17 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
           {/* Modal */}
           <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ type: "spring", duration: 0.5 }}
-              className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.1 }}
+              className="bg-white rounded-2xl shadow-2xl max-w-md w-full min-h-[400px] flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              <AnimatePresence mode="wait">
+              <div className="flex-1 flex flex-col">
                 {/* Step 1: Email Verification */}
                 {step === "email" && (
-                  <motion.div
-                    key="email"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
-                  >
+                  <div className="flex flex-col h-full">
                     {/* Header */}
                     <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 relative">
                       <button
@@ -264,18 +227,12 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
                         </PrimaryButton>
                       </div>
                     </form>
-                  </motion.div>
+                  </div>
                 )}
 
                 {/* Step 2: Change Password */}
                 {step === "change-password" && (
-                  <motion.div
-                    key="change-password"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.3 }}
-                  >
+                  <div className="flex flex-col h-full">
                     {/* Header */}
                     <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-6 relative">
                       <button
@@ -320,13 +277,9 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
                       />
 
                       {newPassword && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          transition={{ duration: 0.3 }}
-                        >
+                        <div>
                           <PasswordStrength password={newPassword} />
-                        </motion.div>
+                        </div>
                       )}
 
                       <FormInput
@@ -360,27 +313,15 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
                         </PrimaryButton>
                       </div>
                     </form>
-                  </motion.div>
+                  </div>
                 )}
 
                 {/* Step 3: Success */}
                 {step === "success" && (
-                  <motion.div
-                    key="success"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3 }}
-                    className="p-8 text-center"
-                  >
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", delay: 0.2 }}
-                      className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
-                    >
+                  <div className="p-8 text-center flex-1 flex flex-col justify-center">
+                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <CheckCircle2 className="w-10 h-10 text-green-600" />
-                    </motion.div>
+                    </div>
 
                     <h3 className="text-2xl text-gray-900 mb-3">
                       ¡Contraseña actualizada!
@@ -408,9 +349,9 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
                       <ArrowLeft className="w-5 h-5" />
                       Iniciar sesión
                     </PrimaryButton>
-                  </motion.div>
+                  </div>
                 )}
-              </AnimatePresence>
+              </div>
             </motion.div>
           </div>
         </>

@@ -1,21 +1,16 @@
-/**
- * Configuración de URLs de microservicios
- * Actualiza estas URLs con las de tu API Gateway
- */
-
 export const API_CONFIG = {
   // URL base del API Gateway
-  BASE_URL: process.env.REACT_APP_API_GATEWAY_URL || 'http://localhost:8080/api',
+  BASE_URL: import.meta.env.VITE_API_GATEWAY_URL || 'http://localhost:8080',
   
-  // Endpoints de microservicios
+  // Endpoints de microservicios me lo dio gpy eso va a cambiar
   AUTH_SERVICE: {
-    BASE: '/auth',
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
-    VERIFY_EMAIL: '/auth/verify-email',
-    RESET_PASSWORD: '/auth/reset-password',
-    REFRESH_TOKEN: '/auth/refresh-token',
-    LOGOUT: '/auth/logout',
+    BASE: '/api/v1/iam',
+    LOGIN: '/api/v1/iam/login',
+    REGISTER: '/api/v1/iam/register',
+    VERIFY_EMAIL: '/api/v1/iam/check-email',
+    RESET_PASSWORD: '/api/v1/iam/reset-password',
+    REFRESH_TOKEN: '/api/v1/iam/refresh-token',
+    LOGOUT: '/api/v1/iam/logout',
   },
   
   ANALYSIS_SERVICE: {
@@ -42,8 +37,8 @@ export const API_CONFIG = {
   
   USER_SERVICE: {
     BASE: '/users',
-    PROFILE: '/users/profile',
-    UPDATE_PROFILE: '/users/profile',
+    PROFILE: '/api/v1/iam/users/profile',
+    UPDATE_PROFILE: '/api/v1/iam/users/profile',
   },
 };
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { DashboardLayout } from "../components/DashboardLayout";
 import { UploadAnalysis } from "../components/UploadAnalysis";
+import { EditProfileModal } from "../components/EditProfileModal";
 import { Activity, TrendingUp, FileText, Clock, AlertCircle, User, Calendar, CheckCircle2, XCircle } from "lucide-react";
 
 interface DashboardPageProps {
@@ -349,6 +350,7 @@ function SoporteContent() {
 
 function PerfilContent() {
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     // Cargar perfil del usuario desde localStorage
@@ -357,6 +359,10 @@ function PerfilContent() {
       setUserProfile(JSON.parse(profile));
     }
   }, []);
+
+  const handleProfileUpdated = (updatedProfile: any) => {
+    setUserProfile(updatedProfile);
+  };
 
   return (
     <div className="p-8">
@@ -374,7 +380,7 @@ function PerfilContent() {
             </div>
             <div className="text-white">
               <h2 className="text-2xl mb-1">
-                {userProfile?.fullName || "Usuario"}
+                {userProfile?.name || "Usuario"}
               </h2>
               <p className="text-blue-100">
                 {userProfile?.specialty || "Especialidad médica"}
@@ -397,8 +403,13 @@ function PerfilContent() {
             </div>
 
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Licencia Médica</p>
-              <p className="text-gray-900">{userProfile?.medicalLicense || "No especificada"}</p>
+              <p className="text-sm text-gray-500">DNI</p>
+              <p className="text-gray-900">{userProfile?.dni || "No especificado"}</p>
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">ID Profesional</p>
+              <p className="text-gray-900">{userProfile?.professionalId || "No especificado"}</p>
             </div>
 
             <div className="space-y-1">
@@ -418,12 +429,23 @@ function PerfilContent() {
           </div>
 
           <div className="mt-8 pt-8 border-t border-gray-200">
-            <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button 
+              onClick={() => setIsEditModalOpen(true)}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
               Editar Perfil
             </button>
           </div>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        userProfile={userProfile}
+        onProfileUpdated={handleProfileUpdated}
+      />
     </div>
   );
 }

@@ -1,7 +1,3 @@
-/**
- * useAuth Hook - Hook personalizado para autenticación
- */
-
 import { useState } from 'react';
 import { authService } from '../services/auth.service';
 import {

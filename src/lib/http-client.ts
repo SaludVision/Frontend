@@ -1,7 +1,3 @@
-/**
- * HTTP Client - Manejo centralizado de peticiones HTTP
- */
-
 import { API_CONFIG, API_TIMEOUT } from '../config/api.config';
 import { ApiError } from '../types/domain.types';
 
@@ -16,16 +12,10 @@ class HttpClient {
     this.baseURL = baseURL;
   }
 
-  /**
-   * Obtiene el token de autenticación del localStorage
-   */
   private getAuthToken(): string | null {
     return localStorage.getItem('accessToken');
   }
 
-  /**
-   * Maneja errores de las respuestas HTTP
-   */
   private async handleError(response: Response): Promise<never> {
     let errorData: any;
     
@@ -45,9 +35,6 @@ class HttpClient {
     throw apiError;
   }
 
-  /**
-   * Realiza una petición HTTP con timeout
-   */
   private async fetchWithTimeout(
     url: string,
     config: RequestConfig = {}
@@ -77,9 +64,7 @@ class HttpClient {
     }
   }
 
-  /**
-   * GET request
-   */
+  //GET
   async get<T>(endpoint: string, config?: RequestConfig): Promise<T> {
     const token = this.getAuthToken();
     const headers: HeadersInit = {
@@ -101,9 +86,7 @@ class HttpClient {
     return response.json();
   }
 
-  /**
-   * POST request
-   */
+  //POST
   async post<T>(
     endpoint: string,
     data?: any,
@@ -130,9 +113,7 @@ class HttpClient {
     return response.json();
   }
 
-  /**
-   * POST con FormData (para archivos)
-   */
+  //POST
   async postFormData<T>(
     endpoint: string,
     formData: FormData,
@@ -143,8 +124,6 @@ class HttpClient {
       ...(token && { Authorization: `Bearer ${token}` }),
       ...config?.headers,
     };
-    // NO incluir Content-Type para FormData, el navegador lo maneja automáticamente
-
     const response = await this.fetchWithTimeout(`${this.baseURL}${endpoint}`, {
       method: 'POST',
       headers,
@@ -159,9 +138,7 @@ class HttpClient {
     return response.json();
   }
 
-  /**
-   * PUT request
-   */
+  //PUT
   async put<T>(
     endpoint: string,
     data?: any,
@@ -188,9 +165,7 @@ class HttpClient {
     return response.json();
   }
 
-  /**
-   * DELETE request
-   */
+  //DELETE
   async delete<T>(endpoint: string, config?: RequestConfig): Promise<T> {
     const token = this.getAuthToken();
     const headers: HeadersInit = {
@@ -213,5 +188,4 @@ class HttpClient {
   }
 }
 
-// Instancia singleton del cliente HTTP
 export const httpClient = new HttpClient(API_CONFIG.BASE_URL);

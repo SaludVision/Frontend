@@ -1,8 +1,3 @@
-/**
- * Report Service - Servicio de reportes
- * Maneja toda la lógica relacionada con reportes médicos
- */
-
 import { httpClient } from '../lib/http-client';
 import { API_CONFIG } from '../config/api.config';
 import {
@@ -12,18 +7,14 @@ import {
 } from '../types/domain.types';
 
 class ReportService {
-  /**
-   * Obtener reporte por ID
-   */
+  // Obtener reporte por ID
   async getReportById(id: string): Promise<Report> {
     const endpoint = API_CONFIG.REPORT_SERVICE.GET_BY_ID.replace(':id', id);
     const response = await httpClient.get<Report>(endpoint);
     return response;
   }
 
-  /**
-   * Listar reportes con paginación
-   */
+  // Listar reportes con paginación
   async listReports(params?: PaginationParams): Promise<ReportListResponse> {
     const queryParams = new URLSearchParams();
     
@@ -38,9 +29,7 @@ class ReportService {
     return response;
   }
 
-  /**
-   * Descargar reporte
-   */
+  // Descargar reporte por ID
   async downloadReport(id: string): Promise<Blob> {
     const endpoint = API_CONFIG.REPORT_SERVICE.DOWNLOAD.replace(':id', id);
     const token = localStorage.getItem('accessToken');
