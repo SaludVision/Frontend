@@ -1,4 +1,5 @@
 import { Home, FileText, Bell, HelpCircle, User, LogOut } from "lucide-react";
+import imgMediScanIa from "../assets/mediscan-logo.png";
 
 type SidebarItem = {
   id: string;
@@ -26,10 +27,11 @@ export function Sidebar({ activeItem, onNavigate, onLogout }: SidebarProps) {
       {/* Logo */}
       <div className="p-6 pb-8">
         <div className="flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-blue-600 mb-1">MediScan</h1>
-            <p className="text-sm text-gray-500 font-medium">IA Médica</p>
-          </div>
+          <img 
+            src={imgMediScanIa} 
+            alt="MediScan IA" 
+            className="w-40 h-40 object-contain"
+          />
         </div>
       </div>
 
