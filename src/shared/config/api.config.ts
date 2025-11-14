@@ -1,6 +1,6 @@
 export const API_CONFIG = {
   // URL base del API Gateway
-  BASE_URL: import.meta.env.VITE_API_GATEWAY_URL || 'http://localhost:8080',
+  BASE_URL: (import.meta as any).env?.VITE_API_GATEWAY_URL || 'http://localhost:8080',
   
   // Endpoints de microservicios me lo dio gpy eso va a cambiar
   AUTH_SERVICE: {

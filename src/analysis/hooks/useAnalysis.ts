@@ -5,7 +5,7 @@ import {
   Analysis,
   PaginationParams,
   ApiError,
-} from '../types/domain.types';
+} from '../model/analysis.types';
 
 export function useAnalysis() {
   const [loading, setLoading] = useState(false);

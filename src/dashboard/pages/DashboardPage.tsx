@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { DashboardLayout } from "../components/DashboardLayout";
-import { UploadAnalysis } from "../components/UploadAnalysis";
+import { UploadAnalysis } from "../../analysis/components/UploadAnalysis";
 import { EditProfileModal } from "../components/EditProfileModal";
 import { Activity, TrendingUp, FileText, Clock, AlertCircle, User, Calendar, CheckCircle2, XCircle } from "lucide-react";
 
@@ -340,7 +340,7 @@ function SoporteContent() {
               <strong>Mientras tanto, puedes contactarnos:</strong>
             </p>
             <p className="text-sm text-gray-600">📧 Email: soporte@mediscania.com</p>
-            <p className="text-sm text-gray-600">📞 Teléfono: +1 (800) 123-4567</p>
+            <p className="text-sm text-gray-600">📞 Teléfono: +51 987 654 321</p>
           </div>
         </div>
       </div>

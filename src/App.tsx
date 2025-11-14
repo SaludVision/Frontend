@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { LoginPage } from "./pages/LoginPage";
-import { RegisterPage } from "./pages/RegisterPage";
-import { DashboardPage } from "./pages/DashboardPage";
+import { LoginPage } from "./iam/pages/LoginPage";
+import { RegisterPage } from "./iam/pages/RegisterPage";
+import { DashboardPage } from "./dashboard/pages/DashboardPage";
 
 type Page = "login" | "register" | "dashboard";
 

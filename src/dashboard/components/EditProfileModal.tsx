@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, User, Save } from "lucide-react";
-import { FormInput } from "./FormInput";
-import { PrimaryButton } from "./PrimaryButton";
+import { FormInput } from "../../iam/components/FormInput";
+import { PrimaryButton } from "../../iam/components/PrimaryButton";
 import { userService } from "../services/user.service";
 
 interface EditProfileModalProps {

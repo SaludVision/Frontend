@@ -1,10 +1,10 @@
-import { httpClient } from '../lib/http-client';
-import { API_CONFIG } from '../config/api.config';
+import { httpClient } from '../../shared/services/http-client';
+import { API_CONFIG } from '../../shared/config/api.config';
 import {
   Report,
   ReportListResponse,
   PaginationParams,
-} from '../types/domain.types';
+} from '../model/analysis.types';
 
 class ReportService {
   // Obtener reporte por ID

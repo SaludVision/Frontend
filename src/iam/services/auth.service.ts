@@ -1,5 +1,5 @@
-import { httpClient } from '../lib/http-client';
-import { API_CONFIG } from '../config/api.config';
+import { httpClient } from '../../shared/services/http-client';
+import { API_CONFIG } from '../../shared/config/api.config';
 import {
   LoginRequest,
   LoginResponse,
@@ -9,7 +9,7 @@ import {
   VerifyEmailResponse,
   ResetPasswordRequest,
   ResetPasswordResponse,
-} from '../types/domain.types';
+} from '../model/auth.types';
 
 class AuthService {
   // Iniciar sesión

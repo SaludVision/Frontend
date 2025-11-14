@@ -6,7 +6,7 @@ import {
   VerifyEmailRequest,
   ResetPasswordRequest,
   ApiError,
-} from '../types/domain.types';
+} from '../model/auth.types';
 
 export function useAuth() {
   const [loading, setLoading] = useState(false);

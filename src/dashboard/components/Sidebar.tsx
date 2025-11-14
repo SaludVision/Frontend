@@ -1,5 +1,6 @@
 import { Home, FileText, Bell, HelpCircle, User, LogOut } from "lucide-react";
-import imgMediScanIa from "../assets/mediscan-logo.png";
+// @ts-ignore
+import imgMediScanIa from "../../assets/mediscan-logo.png";
 
 type SidebarItem = {
   id: string;

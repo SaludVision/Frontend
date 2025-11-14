@@ -1,4 +1,4 @@
-import { API_CONFIG } from '../config/api.config';
+import { API_CONFIG } from '../../shared/config/api.config';
 import {
   LoginRequest,
   LoginResponse,
@@ -8,7 +8,7 @@ import {
   VerifyEmailResponse,
   ResetPasswordRequest,
   ResetPasswordResponse,
-} from '../types/domain.types';
+} from '../model/auth.types';
 
 import {
   adaptLoginRequest,

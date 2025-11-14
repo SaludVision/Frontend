@@ -1,9 +1,24 @@
-import { httpClient } from '../lib/http-client';
-import { API_CONFIG } from '../config/api.config';
-import {
-  Notification,
-  NotificationListResponse,
-} from '../types/domain.types';
+import { httpClient } from '../../shared/services/http-client';
+import { API_CONFIG } from '../../shared/config/api.config';
+
+export type NotificationType = 'success' | 'warning' | 'info' | 'error';
+
+export interface Notification {
+  id: string;
+  userId: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+  metadata?: Record<string, any>;
+}
+
+export interface NotificationListResponse {
+  notifications: Notification[];
+  unreadCount: number;
+  total: number;
+}
 
 class NotificationService {
   // Listar notificaciones del usuario

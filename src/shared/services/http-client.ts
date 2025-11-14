@@ -1,5 +1,11 @@
 import { API_CONFIG, API_TIMEOUT } from '../config/api.config';
-import { ApiError } from '../types/domain.types';
+
+export interface ApiError {
+  message: string;
+  code: string;
+  status: number;
+  details?: Record<string, any>;
+}
 
 interface RequestConfig extends RequestInit {
   timeout?: number;

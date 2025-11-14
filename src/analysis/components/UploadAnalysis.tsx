@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Upload, X, FileImage, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
-import { PrimaryButton } from "./PrimaryButton";
+import { PrimaryButton } from "../../iam/components/PrimaryButton";
 
 interface UploadAnalysisProps {
   onUploadComplete?: (file: File, analysisType: string) => void;

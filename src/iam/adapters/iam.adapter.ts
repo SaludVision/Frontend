@@ -4,7 +4,7 @@ import {
   RegisterRequest,
   RegisterResponse,
   UserProfile,
-} from '../types/domain.types';
+} from '../model/auth.types';
 
 export interface IamLoginRequest {
   username: string;
