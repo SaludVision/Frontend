@@ -49,6 +49,8 @@ class AuthService {
       }
     );
 
+    console.log('Register response:', response);
+
     return response;
   }
 

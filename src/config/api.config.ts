@@ -4,9 +4,9 @@ export const API_CONFIG = {
   
   // Endpoints de microservicios me lo dio gpy eso va a cambiar
   AUTH_SERVICE: {
-    BASE: '/api/v1/iam',
-    LOGIN: '/api/v1/iam/login',
-    REGISTER: '/api/v1/iam/register',
+    BASE: '/api/v1',
+    LOGIN: '/api/v1/login',
+    REGISTER: '/api/v1/register',
     VERIFY_EMAIL: '/api/v1/iam/check-email',
     RESET_PASSWORD: '/api/v1/iam/reset-password',
     REFRESH_TOKEN: '/api/v1/iam/refresh-token',

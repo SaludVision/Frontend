@@ -35,6 +35,29 @@ class HttpClient {
     throw apiError;
   }
 
+  private async parseResponse<T>(response: Response): Promise<T> {
+    const contentType = response.headers.get('content-type');
+    const text = await response.text();
+    
+    // Si no hay contenido, devolver un objeto vacío
+    if (!text) {
+      return {} as T;
+    }
+    
+    // Si el Content-Type indica JSON o el texto parece ser JSON, intentar parsearlo
+    if (contentType?.includes('application/json')) {
+      try {
+        return JSON.parse(text) as T;
+      } catch {
+        // Si falla el parseo pero el Content-Type es JSON, devolver el texto como mensaje
+        return { message: text } as T;
+      }
+    }
+    
+    // Si es texto plano, devolverlo como un objeto con el mensaje
+    return { message: text } as T;
+  }
+
   private async fetchWithTimeout(
     url: string,
     config: RequestConfig = {}
@@ -83,7 +106,7 @@ class HttpClient {
       await this.handleError(response);
     }
 
-    return response.json();
+    return this.parseResponse<T>(response);
   }
 
   //POST
@@ -110,7 +133,7 @@ class HttpClient {
       await this.handleError(response);
     }
 
-    return response.json();
+    return this.parseResponse<T>(response);
   }
 
   //POST
@@ -135,7 +158,7 @@ class HttpClient {
       await this.handleError(response);
     }
 
-    return response.json();
+    return this.parseResponse<T>(response);
   }
 
   //PUT
@@ -162,7 +185,7 @@ class HttpClient {
       await this.handleError(response);
     }
 
-    return response.json();
+    return this.parseResponse<T>(response);
   }
 
   //DELETE
@@ -184,7 +207,7 @@ class HttpClient {
       await this.handleError(response);
     }
 
-    return response.json();
+    return this.parseResponse<T>(response);
   }
 }
 
