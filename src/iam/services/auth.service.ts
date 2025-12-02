@@ -14,42 +14,86 @@ import {
 class AuthService {
   // Iniciar sesión
   async login(request: LoginRequest): Promise<LoginResponse> {
-    const response = await httpClient.post<LoginResponse>(
+    const backendResponse = await httpClient.post<{ userId: number; mensaje: string }>(
       API_CONFIG.AUTH_SERVICE.LOGIN,
       {
-        email: request.email,
-        password: request.password,
-        rememberMe: request.rememberMe
+        correo: request.email,
+        password: request.password
       }
     );
 
-    // Guardar tokens en localStorage
-    if (response.accessToken) {
-      localStorage.setItem('accessToken', response.accessToken);
-      localStorage.setItem('refreshToken', response.refreshToken);
-      localStorage.setItem('userProfile', JSON.stringify(response.user));
+    // Adaptar respuesta del backend al formato del frontend
+    if (backendResponse.userId === 0) {
+      throw new Error(backendResponse.mensaje || 'Credenciales incorrectas');
     }
+
+    // Crear respuesta adaptada (sin tokens reales por ahora)
+    const response: LoginResponse = {
+      user: {
+        id: backendResponse.userId.toString(),
+        name: '',
+        email: request.email,
+        dni: '',
+        specialty: '',
+        professionalId: '',
+        hospital: '',
+        phone: '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      accessToken: `temp-token-${backendResponse.userId}`,
+      refreshToken: `temp-refresh-${backendResponse.userId}`,
+      expiresIn: 3600
+    };
+
+    // Guardar en localStorage
+    localStorage.setItem('accessToken', response.accessToken);
+    localStorage.setItem('refreshToken', response.refreshToken);
+    localStorage.setItem('userId', backendResponse.userId.toString());
+    localStorage.setItem('userProfile', JSON.stringify(response.user));
 
     return response;
   }
 
   // Registrar nuevo usuario
   async register(request: RegisterRequest): Promise<RegisterResponse> {
-    const response = await httpClient.post<RegisterResponse>(
+    const backendResponse = await httpClient.post<{ response: string }>(
       API_CONFIG.AUTH_SERVICE.REGISTER,
       {
+        nombre: request.name,
+        correo: request.email,
+        password: request.password,
+        dni: request.dni,
+        especialidad: request.specialty,
+        idProfesional: parseInt(request.professionalId) || 0,
+        hospital: request.hospital,
+        telefonoContacto: request.phone
+      }
+    );
+
+    console.log('Register response:', backendResponse);
+
+    // Verificar si el registro fue exitoso
+    if (backendResponse.response !== 'Registro Exitoso') {
+      throw new Error(backendResponse.response || 'Error en el registro');
+    }
+
+    // Adaptar respuesta del backend al formato del frontend
+    const response: RegisterResponse = {
+      user: {
+        id: '0',
         name: request.name,
         email: request.email,
-        password: request.password,
         dni: request.dni,
         specialty: request.specialty,
         professionalId: request.professionalId,
         hospital: request.hospital,
-        phone: request.phone
-      }
-    );
-
-    console.log('Register response:', response);
+        phone: request.phone,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      message: backendResponse.response
+    };
 
     return response;
   }

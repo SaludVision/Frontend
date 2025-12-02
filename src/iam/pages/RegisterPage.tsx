@@ -103,6 +103,8 @@ export function RegisterPage({ onNavigateToLogin, onRegisterSuccess }: RegisterP
 
     if (!formData.professionalId.trim()) {
       newErrors.professionalId = "El ID profesional es requerido";
+    } else if (!/^\d+$/.test(formData.professionalId)) {
+      newErrors.professionalId = "El ID profesional debe ser numérico";
     }
 
     if (!formData.hospital.trim()) {
@@ -368,7 +370,8 @@ export function RegisterPage({ onNavigateToLogin, onRegisterSuccess }: RegisterP
               <FormInput
                 label="ID Profesional / Matrícula profesional"
                 name="professionalId"
-                placeholder="MP 12345"
+                type="number"
+                placeholder="12345"
                 required
                 value={formData.professionalId}
                 onChange={handleChange}
